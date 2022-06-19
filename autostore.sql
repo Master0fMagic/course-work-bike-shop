@@ -1,20 +1,8 @@
-create table equipment(
-id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-name TEXT NOT NULL);
-
-create table enginetype(
-id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-name TEXT NOT NULL);
-
-create table gearbox(
-id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-name TEXT NOT NULL);
-
-create table cartype(
-id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-name TEXT NOT NULL);
-
 create table firm(
+id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+name TEXT NOT NULL);
+
+create table "type"(
 id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 name TEXT NOT NULL);
 
@@ -24,7 +12,6 @@ name TEXT NOT NULL,
 address TEXT NOT NULL
 )
 
-
 create table client(
 id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 login TEXT NOT NULL,
@@ -32,31 +19,24 @@ password TEXT NOT NULL,
 registrationdate UNSIGNED BIG INT DEFAULT ( CAST(strftime('%s', 'now') AS UNSIGNED BIG INT))
 );
 
-
-create table auto(
+create table bike(
 id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-produceyear  INTEGER NOT NULL,
-equipmentid INTEGER NOT NULl,
-enginetypeid INTEGER NOT NULL,
-gearboxtypeid INTEGER NOT NULL,
-enginevolume DOUBLE,
-cartypeid INTEGER NOT NULL,
+typeid INTEGER NOT NULL,
 firmid INTEGER NOT NULL,
 model TEXT NOT NULL,
-horsepower DOUBLE NOT NULL,
-baterycapacity DOUBLE,
+frame TEXT NOT NULL,
+seat TEXT NOT NULL,
+brakes TEXT NOT NULL,
+"chain" TEXT NOT NULL,
 image TEXT NOT NULL,
-FOREIGN KEY(equipmentid) REFERENCES equipment(id),
-FOREIGN KEY(enginetypeid) REFERENCES enginetype(id),
-FOREIGN KEY(gearboxtypeid) REFERENCES gearboxtype(id),
-FOREIGN KEY(cartypeid) REFERENCES cartype(id),
+FOREIGN KEY(typeid) REFERENCES "type"(id),
 FOREIGN KEY(firmid) REFERENCES firm(id)
 );
 
 
-create table dillercentercar(
+create table dillercenterbike(
 id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-carid INTEGER NOT NULL,
+bikeid INTEGER NOT NULL,
 dillercenterid NOT NULL
 )
 
@@ -74,57 +54,42 @@ FOREIGN KEY(dillercenterid) REFERENCES dillercenter(id)
 );
 
 
-INSERT INTO equipment(name) VALUES
-("luxury"),
-("standart"),
-("sport"),
-("citymobile");
-
-INSERT INTO enginetype(name) VALUES
-("electrical"),
-("gas"),
-("diesel");
-
-INSERT INTO gearbox(name) VALUES
-("mechanical"),
-("automation");
-
-INSERT INTO cartype(name) VALUES
-("sedan"),
-("hatchback"),
-("suv"),
-("van"),
-("sport car"),
-("truck");
-
 INSERT INTO firm(name) VALUES
-("VolksWagen"),
-("Tesla"),
-("Porsche"),
-("Toyota"),
-("Citroen");
+("BH"),
+("Cannondale CAAD"),
+("BIANCHI"),
+("TRINX"),
+("BATTLE"),
+("Cube Nuroad");
+
+INSERT INTO "type"(name) VALUES
+("шосейний"),
+("горний"),
+("складний"),
+("туристичний");
+
 
 INSERT INTO client(login, password) VALUES
 ("test1", "123123"),
 ("test2", "123123"),
 ("test", "123123");
 
-INSERT INTO auto(produceyear,equipmentid, enginetypeid, gearboxtypeid, cartypeid, firmid,model, enginevolume, horsepower,baterycapacity, image  ) VALUES
-(2020, 3, 2, 2, 5, 3, '911 Turbo S', 4.3, 850, null, 'https://www.nicepng.com/png/detail/237-2375010_911-turbo-s-porsche-models.png'),
-(2018, 1, 1, 2, 1, 2, 'Model S', null, 945, 67.9, 'https://www.kindpng.com/picc/m/125-1250076_transparent-tesla-png-tesla-model-s-transparent-png.png'),
-(2022, 2, 2, 2, 4, 1, 'Transporter', 5.2, 230, null, 'https://www.nicepng.com/png/detail/379-3797738_new-volkswagen-transporter-kombi-sportline-van-volkswagen-transporter.png'),
-(2020, 4, 2, 2, 3, 5, 'C4', 1.2, 125, null,  'https://www.seekpng.com/png/small/367-3678493_new-c4-cactus-citroen-c4.png'),
-(2020, 2, 3, 2, 5, 4, 'Tundra TRD Pro', 5.7, 675, null,'https://www.kindpng.com/picc/m/615-6158151_toyota-tundra-trd-pro-19-hd-png-download.png'),
-(2020, 2, 2, 1, 5, 4, 'Tundra TRD Pro', 5.3, 601, null,'https://www.pngkey.com/png/detail/394-3945360_new-2018-toyota-tundra-platinum-2019-tundra-trd.png' );
+INSERT INTO bike(typeid, firmid, model, frame, seat, brakes, "chain", image) VALUES
+(1,1, 'G7 Pro', 'Global Concept G7 Pro Carbon Monocoque', 'Prologo Kappa RS', 'Shimano Ultegra DM', 'FSA TH-CN1102', ''),
+(1,2, 'Optimo 4', 'SmartForm C2 Alloy', 'Cannondale Stage CX', 'Promax RC-452', 'Shimano HG71', ''),
+(2,3, 'Specialissima CV Ultegra Di2 11s Stages LR', 'BIANCHI Specialissima 57cm Celeste', 'Shimano Ultegra DI2 R8050 11 s', 'BIANCHI Fizik Arione R3 304x126mm Black', 'SHIMANO CN-HG701', ''),
+(3,4 , 'Dolphin 1.0', 'Shimano', 'Trinx Comfort', 'Tektro', 'M30 7S', ''),
+(3,5 , 'E300 7', 'E300 frame', 'Hollow Thickened Wide-tailed', 'SHIMANO', 'Chengshin', ''),
+(4,6 , 'Race FE 28', 'Aluminium 6061 T6 Superlite', 'Natural Fit Venec Lite', ' Shimano BR-RX400', 'Shimano CN-HG600-11', '');
 
 
 INSERT INTO dillercenter(name, address) VALUES
-("Toyota Center", "Рј.РҐР°СЂРєС–РІ, РІСѓР».РЎСѓРјСЃСЊРєР°, 90"),
-("Elite cars showroom", "Рј.РљРёС—РІ, РІСѓР».РҐСЂРµС‰Р°С‚РёРє, 17"),
-("Every day cars", "Рј.РҐР°СЂРєС–РІ, РїСЂ.Р“РµСЂРѕС—РІ РҐР°СЂРєРѕРІР°, 327"),
-("Citroen center", "Рј.Р›СЊРІС–РІ, РІСѓР».Р“РµСЂРѕС—РІ РЈРєСЂР°С—РЅРё, 25");
+("Toyota Center", "м.Харків, вул.Сумська, 90"),
+("Elite cars showroom", "м.Київ, вул.Хрещатик, 17"),
+("Every day cars", "м.Харків, пр.Героїв Харкова, 327"),
+("Citroen center", "м.Львів, вул.Героїв України, 25");
 
-INSERT INTO dillercentercar(carid, dillercenterid) VALUES
+INSERT INTO dillercenterbike (bikeid  , dillercenterid) VALUES
 (1, 2),
 (2, 2),
 (3, 3),
@@ -133,6 +98,11 @@ INSERT INTO dillercentercar(carid, dillercenterid) VALUES
 (5, 1),
 (5, 3),
 (6, 1);
+
+
+
+
+
 
 
 
