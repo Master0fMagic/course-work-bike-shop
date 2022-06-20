@@ -84,10 +84,10 @@ INSERT INTO bike(typeid, firmid, model, frame, seat, brakes, "chain", image) VAL
 
 
 INSERT INTO dillercenter(name, address) VALUES
-("Toyota Center", "м.Харків, вул.Сумська, 90"),
-("Elite cars showroom", "м.Київ, вул.Хрещатик, 17"),
-("Every day cars", "м.Харків, пр.Героїв Харкова, 327"),
-("Citroen center", "м.Львів, вул.Героїв України, 25");
+("Cental center", "м.Харків, вул.Сумська, 90"),
+("Bikes for soul", "м.Київ, вул.Хрещатик, 17"),
+("Every day bikes", "м.Харків, пр.Героїв Харкова, 327"),
+("Best bikes", "м.Львів, вул.Героїв України, 25");
 
 INSERT INTO dillercenterbike (bikeid  , dillercenterid) VALUES
 (1, 2),
@@ -98,24 +98,6 @@ INSERT INTO dillercenterbike (bikeid  , dillercenterid) VALUES
 (5, 1),
 (5, 3),
 (6, 1);
-
-
-SELECT b.id , t.name, f.name ,b.model ,b.frame , b.seat, b.brakes, b."chain", b.image 
-from bike b 
-join firm f on b.firmid = f.id 
-join "type" t on t.id = b.typeid;
-
-SELECT *FROM testdrives t;
-
-
-SELECT b.id , t.name, f.name ,b.model ,b.frame , b.seat, b.brakes, b."chain", b.image 
-from bike b 
-join firm f on b.firmid = f.id 
-join "type" t on t.id = b.typeid
-join testdrives td on td.autoid = b.id
-where td.id =1;
-
-SELECT *FROM testdrives t 
 
 
 
