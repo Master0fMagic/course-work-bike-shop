@@ -161,7 +161,7 @@ where c.login = '{login}' or c.id = '{login}';
         sql = '''SELECT b.id , t.name, f.name ,b.model ,b.frame , b.seat, b.brakes, b."chain", b.image 
 from bike b 
 join firm f on b.firmid = f.id 
-join type ty on ty.id = b.typeid;'''
+join type t on t.id = b.typeid;'''
 
         res = self._db.execute_select(sql)
         return [converter.DbResponseToBikeConverter().convert(data=row) for row in res]
