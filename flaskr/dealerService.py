@@ -11,7 +11,7 @@ class AbstractDealerService(ABC):
         pass
 
     @abstractmethod
-    def get_dealer_center_by_car(self, car_id) -> list[dto.DealerCenter]:
+    def get_dealer_center_by_bike(self, car_id) -> list[dto.DealerCenter]:
         pass
 
     @abstractmethod
@@ -21,10 +21,10 @@ class AbstractDealerService(ABC):
 
 class DealerService(AbstractDealerService):
     def get_booked_dates(self, car_id, dealer_center_id) -> list[int]:
-        return self._provider.get_booked_cars(car_id, dealer_center_id)
+        return self._provider.get_booked_bikes(car_id, dealer_center_id)
 
-    def get_dealer_center_by_car(self, car_id) -> list[dto.DealerCenter]:
-        return self._provider.get_dealer_centers_by_car(car_id)
+    def get_dealer_center_by_bike(self, car_id) -> list[dto.DealerCenter]:
+        return self._provider.get_dealer_centers_by_bike(car_id)
 
     def get_dealer_centers(self) -> list[dto.DealerCenter]:
         return self._provider.get_centers()

@@ -22,7 +22,7 @@ class DbResponseToClientConverter(AbstractConverter):
         return dto.Client(*kwargs['data'])
 
 
-class DbResponseToCarConverter(AbstractConverter):
+class DbResponseToBikeConverter(AbstractConverter):
     def convert(self, **kwargs):
         """
         kwargs:
@@ -32,7 +32,7 @@ class DbResponseToCarConverter(AbstractConverter):
         if 'data' not in kwargs:
             raise KeyError('"data" is not present in kwargs')
 
-        return dto.Car(*kwargs['data'])
+        return dto.Bike(*kwargs['data'])
 
 
 class DbResponseToTestDriveConverter(AbstractConverter):

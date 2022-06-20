@@ -3,7 +3,7 @@ from flask_cors import CORS
 
 from setup import init_app
 from clientService import ClientService
-from carService import CarService
+from bikeService import BikeService
 from testDriveService import TestDriveService
 from dealerService import DealerService
 from flask_login import login_user, logout_user, login_required, current_user
@@ -84,34 +84,32 @@ def sing_up():
     return jsonify(success=True)
 
 
-@app.route('/api/cars')
+@app.route('/api/bikes')
 def get_cars():
     """
     :return JSON: {
-        cars: [
+        'data': [
          {
-            'id': 1,
-            'produce_year': 2000,
-            'equipment': "",
-            'engine': "",
-            'car_type': "",
-            'firm': "",
-            'model': "",
-            'horse_powers': 1,
-            'battery_capacity': 0.0 // or null if not set
-            'engine_volume': 0.0 //or null if not set,
-            'image':""
+             "brakes": "Shimano Ultegra DM",
+            "chain": "FSA TH-CN1102",
+            "firm": "BH",
+            "frame": "Global Concept G7 Pro Carbon Monocoque",
+            "id": 1,
+            "image": "",
+            "model": "G7 Pro",
+            "seat": "Prologo Kappa RS",
+            "type": "шосейний"
         }
         ]
     }
     """
-    cs = CarService()
+    bs = BikeService()
     return {
-        'cars': [car.to_dict() for car in cs.get_cars()]
+        'data': [bike.to_dict() for bike in bs.get_bikes()]
     }
 
 
-@app.route('/api/cars/filter/firm')
+@app.route('/api/bikes/filter/firm')
 def get_firm_filter_values():
     """
     :return: JSON: {
@@ -123,49 +121,13 @@ def get_firm_filter_values():
     ]
     }
     """
-    cs = CarService()
+    bs = BikeService()
     return {
-        'values': [item.to_dict() for item in cs.get_firm_filter()]
+        'values': [item.to_dict() for item in bs.get_firm_filter()]
     }
 
 
-@app.route('/api/cars/filter/gearbox')
-def get_gearbox_filter_values():
-    """
-    :return: JSON: {
-    'values':[
-        {
-            "id":1,
-            "name":""
-        }
-    ]
-    }
-    """
-    cs = CarService()
-    return {
-        'values': [item.to_dict() for item in cs.get_gearbox_filter()]
-    }
-
-
-@app.route('/api/cars/filter/equipment')
-def get_equipment_filter_values():
-    """
-    :return: JSON: {
-    'values':[
-        {
-            "id":1,
-            "name":""
-        }
-    ]
-    }
-    """
-    cs = CarService()
-    return {
-        'values': [item.to_dict() for item in cs.get_equipment_filter()]
-    }
-
-
-@app.route('/api/cars/filter/type')
+@app.route('/api/bikes/filter/type')
 def get_type_filter_values():
     """
     :return: JSON: {
@@ -177,27 +139,9 @@ def get_type_filter_values():
     ]
     }
     """
-    cs = CarService()
+    bs = BikeService()
     return {
-        'values': [item.to_dict() for item in cs.get_car_type_filter()]
-    }
-
-
-@app.route('/api/cars/filter/engine')
-def get_engine_filter_values():
-    """
-    :return: JSON: {
-    'values':[
-        {
-            "id":1,
-            "name":""
-        }
-    ]
-    }
-    """
-    cs = CarService()
-    return {
-        'values': [item.to_dict() for item in cs.get_engine_type_filter()]
+        'values': [item.to_dict() for item in bs.get_type_filter()]
     }
 
 
@@ -206,22 +150,22 @@ def get_engine_filter_values():
 def create_test_drive():
     """
     takes json: {
-    "car_id": <int: auto`s id to test drive>,
+    "bike_id": <int: bike`s id to test drive>,
     "date": <int: test drive date in format od unix time (seconds)>,
     "dealer_center_id": <int: id of dealer center>
     }
     :return: 200 or 40X error
     """
-    auto_id = request.json.get('car_id')
+    bike_id = request.json.get('bike_id')
     date = request.json.get('date')
     dealer_center = request.json.get('dealer_center_id')
 
-    if not (auto_id and date and dealer_center):
+    if not (bike_id and date and dealer_center):
         abort(400, 'Not correct value')
 
     tds = TestDriveService()
     try:
-        tds.create_test_drive(auto_id, date, current_user.id, dealer_center)
+        tds.create_test_drive(bike_id, date, current_user.id, dealer_center)
     except error.BookTestDriveIsImpossible as e:
         abort(400, e.description)
 
@@ -271,27 +215,25 @@ def get_dealer_centers():
     }
 
 
-@app.route('/api/cars/test-drive/<int:test_drive_id>')
+@app.route('/api/bikes/test-drive/<int:test_drive_id>')
 @login_required
 def get_car_by_test_drive(test_drive_id: int):
     """
     ::return JSON: {
-            'id': 1,
-            'produce_year': 2000,
-            'equipment': "",
-            'engine': "",
-            'car_type': "",
-            'firm': "",
-            'model': "",
-            'horse_powers': 1,
-            'battery_capacity': 0.0 // or null if not set
-            'engine_volume': 0.0 //or null if not set,
-            'image':""
+             "brakes": "Shimano Ultegra DM",
+            "chain": "FSA TH-CN1102",
+            "firm": "BH",
+            "frame": "Global Concept G7 Pro Carbon Monocoque",
+            "id": 1,
+            "image": "",
+            "model": "G7 Pro",
+            "seat": "Prologo Kappa RS",
+            "type": "шосейний"
         }
     """
 
-    cs = CarService()
-    return cs.get_car_by_test_drive(test_drive_id).to_dict()
+    bs = BikeService()
+    return bs.get_bike_by_test_drive(test_drive_id).to_dict()
 
 
 @app.route('/api/test-drives/complete/<int:id>', methods=['POST'])
@@ -309,9 +251,9 @@ def complete_test_drive(id: int):
     return jsonify(success=True)
 
 
-@app.route('/api/cars/dealer-center/<int:car_id>')
+@app.route('/api/bikes/dealer-center/<int:bike_id>')
 @login_required
-def get_dealer_center_by_car(car_id: int):
+def get_dealer_center_by_car(bike_id: int):
     """
     :return: dealer centers where car is persist
     JSON: {
@@ -326,30 +268,30 @@ def get_dealer_center_by_car(car_id: int):
     """
     ds = DealerService()
     return {
-        'data': [item.to_dict() for item in ds.get_dealer_center_by_car(car_id)]
+        'data': [item.to_dict() for item in ds.get_dealer_center_by_bike(bike_id)]
     }
 
 
-@app.route('/api/cars/dealer-center/booked')
+@app.route('/api/bikes/dealer-center/booked')
 @login_required
-def get_booked_cars_for_center():
+def get_booked_bikes_for_center():
     """
     takes car_id and dealer_center_id as query params
-    Example: /api/cars/dealer-center/booked?car_id=1&dealer_center_id=1
+    Example: /api/bikes/dealer-center/booked?bike_id=1&dealer_center_id=1
     :return: {
     "data": [<list of time in unix timestamp (in seconds) truncated to day where car is booked for test drive>]
     }
     """
 
-    car_id = int(request.args.get('car_id'))
+    bike_id = int(request.args.get('bike_id'))
     dealer_center_id = int(request.args.get('dealer_center_id'))
 
-    if not (car_id and dealer_center_id):
+    if not (bike_id and dealer_center_id):
         abort(400, "Id is required")
 
     ds = DealerService()
     return {
-        'data': ds.get_booked_dates(car_id, dealer_center_id)
+        'data': ds.get_booked_dates(bike_id, dealer_center_id)
     }
 
 

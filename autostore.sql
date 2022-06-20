@@ -100,6 +100,23 @@ INSERT INTO dillercenterbike (bikeid  , dillercenterid) VALUES
 (6, 1);
 
 
+SELECT b.id , t.name, f.name ,b.model ,b.frame , b.seat, b.brakes, b."chain", b.image 
+from bike b 
+join firm f on b.firmid = f.id 
+join "type" t on t.id = b.typeid;
+
+SELECT *FROM testdrives t;
+
+
+SELECT b.id , t.name, f.name ,b.model ,b.frame , b.seat, b.brakes, b."chain", b.image 
+from bike b 
+join firm f on b.firmid = f.id 
+join "type" t on t.id = b.typeid
+join testdrives td on td.autoid = b.id
+where td.id =1;
+
+SELECT *FROM testdrives t 
+
 
 
 

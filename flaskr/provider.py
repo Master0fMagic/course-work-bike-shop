@@ -6,7 +6,7 @@ import converter
 
 class SqliteDatabaseProvider:
     def execute_select(self, query: str):
-        connection = sqlite3.connect('./autostore.db')
+        connection = sqlite3.connect('./data.db')
         cursor = connection.cursor()
         cursor.execute(query)
         records = cursor.fetchall()
@@ -15,7 +15,7 @@ class SqliteDatabaseProvider:
         return records
 
     def execute_update(self, query):
-        connection = sqlite3.connect('./autostore.db')
+        connection = sqlite3.connect('./data.db')
         cursor = connection.cursor()
         cursor.execute(query)
         res = cursor.fetchall()
@@ -43,9 +43,9 @@ class AbstractClientProvider(ABC):
         pass
 
 
-class AbstractCarProvider(ABC):
+class AbstractBikeProvider(ABC):
     @abstractmethod
-    def get_all_cars(self) -> list[dto.Car]:
+    def get_all_bikes(self) -> list[dto.Bike]:
         pass
 
     @abstractmethod
@@ -53,7 +53,7 @@ class AbstractCarProvider(ABC):
         pass
 
     @abstractmethod
-    def get_car_by_test_drive(self, test_drive_id) -> dto.Car:
+    def get_bike_by_test_drive(self, test_drive_id) -> dto.Bike:
         pass
 
 
@@ -81,15 +81,15 @@ class AbstractDealerCenterProvider(ABC):
         pass
 
     @abstractmethod
-    def get_dealer_centers_by_car(self, car_id: int):
+    def get_dealer_centers_by_bike(self, bike_id: int):
         pass
 
     @abstractmethod
-    def get_booked_cars(self, car_id: int, dealer_center_id: int):
+    def get_booked_bikes(self, bike_id: int, dealer_center_id: int):
         pass
 
 
-class SqliteDataProvider(AbstractClientProvider, AbstractCarProvider, AbstractTestDriveProvider,
+class SqliteDataProvider(AbstractClientProvider, AbstractBikeProvider, AbstractTestDriveProvider,
                          AbstractDealerCenterProvider):
     _provider = None
 
@@ -102,26 +102,22 @@ class SqliteDataProvider(AbstractClientProvider, AbstractCarProvider, AbstractTe
             cls._provider = SqliteDataProvider()
         return cls._provider
 
-    def get_car_by_test_drive(self, test_drive_id) -> dto.Car:
-        sql = f'''SELECT a.id, a.produceyear, e.name, e2.name, g.name, a.enginevolume, c.name, f.name, a.model, 
-        a.horsepower, a.baterycapacity, a.image
-FROM auto a 
-join equipment e on e.id  = a.equipmentid 
-join enginetype e2 on e2.id = a.enginetypeid 
-join gearbox g on g.id = a.gearboxtypeid
-join cartype c on c.id  = a.cartypeid 
-join firm f on f.id = a.firmid 
-join testdrives t on t.autoid = a.id
-where t.id = {test_drive_id};
+    def get_bike_by_test_drive(self, test_drive_id) -> dto.Bike:
+        sql = f'''SELECT b.id , t.name, f.name ,b.model ,b.frame , b.seat, b.brakes, b."chain", b.image 
+from bike b 
+join firm f on b.firmid = f.id 
+join type t on t.id = b.typeid
+join testdrives td on td.autoid = b.id
+where td.id = {test_drive_id};
         '''
 
-        return converter.DbResponseToCarConverter().convert(data=self._db.execute_select(sql)[0])
+        return converter.DbResponseToBikeConverter().convert(data=self._db.execute_select(sql)[0])
 
-    def get_dealer_centers_by_car(self, car_id: int):
+    def get_dealer_centers_by_bike(self, bike_id: int):
         sql = f'''SELECT d.*
 from dillercenter d 
-join dillercentercar d2 on d.id = d2.dillercenterid 
-where d2.carid = {car_id}'''
+join dillercenterbike d2 on d.id = d2.dillercenterid 
+where d2.bikeid = {bike_id}'''
 
         return [converter.DbResponseToDealerCenterConverter().convert(data=item) for item in
                 self._db.execute_select(sql)]
@@ -161,18 +157,14 @@ where c.login = '{login}' or c.id = '{login}';
         self._db.execute_update(sql)
         return self.get_client(login)
 
-    def get_all_cars(self) -> list[dto.Car]:
-        sql = '''SELECT a.id, a.produceyear, e.name, e2.name, g.name, a.enginevolume, c.name, f.name, a.model, a.horsepower, a.baterycapacity, a.image
-FROM auto a 
-join equipment e on e.id  = a.equipmentid 
-join enginetype e2 on e2.id = a.enginetypeid 
-join gearbox g on g.id = a.gearboxtypeid
-join cartype c on c.id  = a.cartypeid 
-join firm f on f.id = a.firmid 
-        '''
+    def get_all_bikes(self) -> list[dto.Bike]:
+        sql = '''SELECT b.id , t.name, f.name ,b.model ,b.frame , b.seat, b.brakes, b."chain", b.image 
+from bike b 
+join firm f on b.firmid = f.id 
+join type ty on ty.id = b.typeid;'''
 
         res = self._db.execute_select(sql)
-        return [converter.DbResponseToCarConverter().convert(data=row) for row in res]
+        return [converter.DbResponseToBikeConverter().convert(data=row) for row in res]
 
     def check_possibility(self, car_id: int, date: int, client_id: int, dealer_center_id: int) -> bool:
         sql = f'''SELECT EXISTS (
@@ -181,7 +173,7 @@ from testdrives t
 where ( (t.autoid = {car_id} and t.dillercenterid = {dealer_center_id} ) or t.clientid = {client_id})
 and t.testdrivedate = {date})
 and EXISTS(
-SELECT id from dillercentercar d where d.dillercenterid = {dealer_center_id} and d.carid = {car_id}
+SELECT id from dillercenterbike d where d.dillercenterid = {dealer_center_id} and d.bikeid = {car_id}
 )
         '''
         res = self._db.execute_select(sql)
@@ -194,10 +186,10 @@ SELECT id from dillercentercar d where d.dillercenterid = {dealer_center_id} and
         self._db.execute_update(sql)
 
     def get_test_drives_by_client(self, client_id: int) -> list[dto.TestDrive]:
-        sql = f'''SELECT t.id, a.produceyear || ' ' || f.name || ' ' || a.model, t.testdrivedate, d.name || ', ' || d.address,
+        sql = f'''SELECT t.id, f.name || ' ' || a.model, t.testdrivedate, d.name || ', ' || d.address,
 t.status
 from testdrives t 
-join auto a ON a.id = t.autoid 
+join bike a ON a.id = t.autoid 
 join firm f ON f.id = a.firmid 
 join dillercenter d on d.id = t.dillercenterid
 where t.clientid = {client_id}'''
@@ -220,10 +212,10 @@ where t.clientid = {client_id}'''
 
         self._db.execute_update(sql)
 
-    def get_booked_cars(self, car_id: int, dealer_center_id: int) -> list[int]:
+    def get_booked_bikes(self, bike_id: int, dealer_center_id: int) -> list[int]:
         sql = f'''SELECT t.testdrivedate 
 from testdrives t 
 where cast(STRFTIME('%s', 'now') AS UNSIGNED BIG INT) < t.testdrivedate 
-and t.autoid = {car_id} and t.dillercenterid = {dealer_center_id}
+and t.autoid = {bike_id} and t.dillercenterid = {dealer_center_id}
 '''
         return [int(item[0]) for item in self._db.execute_select(sql)]
