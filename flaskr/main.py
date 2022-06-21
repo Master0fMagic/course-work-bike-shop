@@ -90,7 +90,7 @@ def get_cars():
     :return JSON: {
         'data': [
          {
-             "brakes": "Shimano Ultegra DM",
+            "brakes": "Shimano Ultegra DM",
             "chain": "FSA TH-CN1102",
             "firm": "BH",
             "frame": "Global Concept G7 Pro Carbon Monocoque",
